@@ -24,4 +24,4 @@ io.on('connection', socket=>{
     })
 })
 
-server.listen(80, () => console.log("Whatsapp is up and running \nhttp://localhost"))
+server.listen(80, () => console.log("Whatsapp is up and running \nclick with CTRL on http://localhost" ))
