@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            box-sizing: border-box;
+            background-color: blanchedalmond;
+        }
+
+        .chat {
+            height: calc(90vh - 15px);
+        }
+
+        .form {
+            height: 10vh;
+            display: flex;
+            justify-content: stretch;
+        }
+
+        input {
+            font-size: xx-large;
+            flex-grow: 4;
+        }
+
+        button {
+            font-size: xx-large;
+            flex-grow: 1;
+        }
+
+        body>* {
+            width: 60vw;
+            max-width: 1000px;
+            margin: 5px auto;
+            border: 3px solid burlywood;
+        }
+
+        .msg {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid burlywood;
+        }
+
+        /* .me{
+            
+        }
+        .other{
+            
+        } */
+    </style>
+</head>
+
+<body>
+    <div class="chat">
+        <p class="typing"></p>
+    </div>
+    <div class="form">
+        <input type="text">
+        <button>send</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const username = prompt("please enter your name:")
+        const socket = io()
+
+        const inp = document.querySelector('input')
+        const btn = document.querySelector('button')
+        const chat = document.querySelector('.chat')
+        const typing = document.querySelector('.typing')
+        let timeout
+
+        btn.addEventListener('click', _ => {
+            if (inp.value) {
+                socket.emit('new msg from client', { msg: inp.value, username })
+                inp.value = ""
+            }
+        })
+
+        socket.on('new msg has arrived', e => {
+            const msgDivElm = document.createElement("div")
+            msgDivElm.className = "msg"
+            const h1 = document.createElement('h1')
+            const p = document.createElement('p')
+            h1.textContent = (e.username == username? "Me": e.username ) + ":"
+            p.textContent = e.msg
+            msgDivElm.appendChild(h1)
+            msgDivElm.appendChild(p)
+            chat.appendChild(msgDivElm)
+        })
+
+        inp.addEventListener('keydown', e=>{
+            socket.emit("typing", username)
+        })
+
+        socket.on('someone is typing', e=>{
+            clearTimeout(timeout)
+            typing.textContent = e + " is typing..."
+            timeout = setTimeout(()=>typing.textContent="", 700)
+            
+        })
+
+    </script>
+</body>
+
+</html>
